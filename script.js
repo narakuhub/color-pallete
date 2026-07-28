@@ -443,7 +443,7 @@ window.addEventListener('load', () => {
     
     if (loadingScreen && progressBarFill && progressPercentage) {
         const totalDuration = 15000; // 15 Detik
-        const intervalTime = 50;     // Update setiap 50ms agar mulus
+        const intervalTime = 150;     // Update setiap 50ms agar mulus
         let currentProgress = 0;
         
         const increment = (intervalTime / totalDuration) * 100;
