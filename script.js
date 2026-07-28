@@ -1,7 +1,3 @@
-/* ========================================================
-   ROBLOX UI COLOR PALETTE EDITOR - SCRIPT.JS
-   ======================================================== */
-
 // State Management
 let state = {
     mainColor: { r: 232, g: 150, b: 35, h: 36, s: 85, l: 52 },
@@ -9,26 +5,20 @@ let state = {
     viewMode: 'grid',
     searchQuery: '',
     editingIndex: null,
-    presets: [],
     palette: [
-        { key: 'background', name: 'Background', hex: '#0F0F0F', r: 15, g: 15, b: 15 },
-        { key: 'card', name: 'Card', hex: '#1C1C1C', r: 28, g: 28, b: 28 },
-        { key: 'header', name: 'Header', hex: '#121418', r: 18, g: 20, b: 24 },
-        { key: 'uiStroke', name: 'UI Stroke', hex: '#E89623', r: 232, g: 150, b: 35 },
+        { key: 'background', name: 'Background', hex: '#F4F6F9', r: 244, g: 246, b: 249 },
+        { key: 'card', name: 'Card Background', hex: '#FFFFFF', r: 255, g: 255, b: 255 },
+        { key: 'header', name: 'Header Background', hex: '#FFFFFF', r: 255, g: 255, b: 255 },
         { key: 'primary', name: 'Primary', hex: '#E89623', r: 232, g: 150, b: 35 },
-        { key: 'primaryHover', name: 'Primary Hover', hex: '#FFB446', r: 255, g: 184, b: 70 },
+        { key: 'primaryHover', name: 'Primary Hover', hex: '#D2821A', r: 210, g: 130, b: 26 },
         { key: 'secondary', name: 'Secondary', hex: '#BF6E12', r: 191, g: 110, b: 18 },
-        { key: 'secondaryHover', name: 'Secondary Hover', hex: '#E89623', r: 232, g: 150, b: 35 },
+        { key: 'secondaryHover', name: 'Secondary Hover', hex: '#A55D0F', r: 165, g: 93, b: 15 },
         { key: 'accent', name: 'Accent', hex: '#FFB446', r: 255, g: 184, b: 70 },
-        { key: 'button', name: 'Button', hex: '#E89623', r: 232, g: 150, b: 35 },
-        { key: 'buttonHover', name: 'Button Hover', hex: '#FFB446', r: 255, g: 184, b: 70 },
-        { key: 'textPrimary', name: 'Text Primary', hex: '#FFFFFF', r: 255, g: 255, b: 255 },
-        { key: 'textSecondary', name: 'Text Secondary', hex: '#B4B4B4', r: 180, g: 180, b: 180 },
+        { key: 'textPrimary', name: 'Text Primary', hex: '#1E293B', r: 30, g: 41, b: 59 },
+        { key: 'textSecondary', name: 'Text Secondary', hex: '#64748B', r: 100, g: 116, b: 139 },
         { key: 'success', name: 'Success', hex: '#22C55E', r: 34, g: 197, b: 94 },
-        { key: 'warning', name: 'Warning', hex: '#FFC107', r: 255, g: 193, b: 7 },
-        { key: 'danger', name: 'Danger', hex: '#EF4444', r: 239, g: 68, b: 68 },
-        { key: 'gradientStart', name: 'Gradient Start', hex: '#E89623', r: 232, g: 150, b: 35 },
-        { key: 'gradientEnd', name: 'Gradient End', hex: '#FFB446', r: 255, g: 184, b: 70 }
+        { key: 'warning', name: 'Warning', hex: '#F59E0B', r: 245, g: 158, b: 11 },
+        { key: 'danger', name: 'Danger', hex: '#EF4444', r: 239, g: 68, b: 68 }
     ]
 };
 
@@ -48,7 +38,6 @@ const colorCountBadge = document.getElementById('colorCountBadge');
 const gridViewBtn = document.getElementById('gridViewBtn');
 const listViewBtn = document.getElementById('listViewBtn');
 const exportBtn = document.getElementById('exportBtn');
-const presetSelect = document.getElementById('presetSelect');
 const toast = document.getElementById('toast');
 
 // Modal Elements
@@ -89,7 +78,7 @@ function rgbToHsl(r, g, b) {
     let h, s, l = (max + min) / 2;
 
     if (max === min) {
-        h = s = 0; // achromatic
+        h = s = 0;
     } else {
         const d = max - min;
         s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
@@ -108,7 +97,7 @@ function hslToRgb(h, s, l) {
     let r, g, b;
 
     if (s === 0) {
-        r = g = b = l; // achromatic
+        r = g = b = l;
     } else {
         const hue2rgb = (p, q, t) => {
             if (t < 0) t += 1;
@@ -136,25 +125,6 @@ function showToast(message = 'Copied to clipboard!') {
     }, 2000);
 }
 
-// Fetch Presets from palettes.json
-async function loadPresets() {
-    try {
-        const response = await fetch('palettes.json');
-        const data = await response.json();
-        state.presets = data;
-        
-        presetSelect.innerHTML = '<option value="" disabled selected>Select Preset</option>';
-        data.forEach((preset, index) => {
-            const opt = document.createElement('option');
-            opt.value = index;
-            opt.textContent = preset.name;
-            presetSelect.appendChild(opt);
-        });
-    } catch (error) {
-        console.error('Failed to load palettes.json', error);
-    }
-}
-
 // Update Palette Automatically based on Main Color
 function generateAutomaticPalette() {
     if (!state.autoGenerate) return;
@@ -162,34 +132,26 @@ function generateAutomaticPalette() {
     const { r, g, b, h } = state.mainColor;
     const mainHex = rgbToHex(r, g, b);
     
-    // Compute secondary color (shifted hue)
     const secH = (h + 30) % 360;
     const secRgb = hslToRgb(secH, 70, 45);
     const secHex = rgbToHex(secRgb.r, secRgb.g, secRgb.b);
     
-    // Compute hover/accent variants
-    const hoverRgb = hslToRgb(h, 80, 64);
+    const hoverRgb = hslToRgb(h, 80, 45);
     const hoverHex = rgbToHex(hoverRgb.r, hoverRgb.g, hoverRgb.b);
 
     state.palette = state.palette.map(item => {
         let newColor = { ...item };
         switch (item.key) {
             case 'primary':
-            case 'button':
-            case 'uiStroke':
-            case 'gradientStart':
                 newColor.hex = mainHex; newColor.r = r; newColor.g = g; newColor.b = b;
                 break;
             case 'primaryHover':
-            case 'buttonHover':
-            case 'accent':
-            case 'gradientEnd':
                 newColor.hex = hoverHex; newColor.r = hoverRgb.r; newColor.g = hoverRgb.g; newColor.b = hoverRgb.b;
                 break;
             case 'secondary':
                 newColor.hex = secHex; newColor.r = secRgb.r; newColor.g = secRgb.g; newColor.b = secRgb.b;
                 break;
-            case 'secondaryHover':
+            case 'accent':
                 newColor.hex = mainHex; newColor.r = r; newColor.g = g; newColor.b = b;
                 break;
             default:
@@ -199,36 +161,22 @@ function generateAutomaticPalette() {
     });
 }
 
-// Update CSS Root Variables for Live Preview
-function updateCssVariables() {
-    const root = document.documentElement;
-    state.palette.forEach(item => {
-        const cssVarName = '--' + item.key.replace(/([A-Z])/g, '-$1').toLowerCase();
-        root.style.setProperty(cssVarName, item.hex);
-    });
-}
-
 // Render UI Components
 function renderUI() {
-    // Render Color Editor UI positions
     const hsl = rgbToHsl(state.mainColor.r, state.mainColor.g, state.mainColor.b);
     state.mainColor.h = hsl.h;
     
-    // Position Hue cursor
     const huePercent = (hsl.h / 360) * 100;
     hueCursor.style.left = `${huePercent}%`;
 
-    // Position Color Area cursor (Saturation / Lightness approximation)
     colorCursor.style.left = `${hsl.s}%`;
     colorCursor.style.top = `${100 - hsl.l}%`;
 
-    // Input values
     hexInput.value = rgbToHex(state.mainColor.r, state.mainColor.g, state.mainColor.b);
     rInput.value = state.mainColor.r;
     gInput.value = state.mainColor.g;
     bInput.value = state.mainColor.b;
 
-    // Render Cards Grid
     const filteredPalette = state.palette.filter(item => 
         item.name.toLowerCase().includes(state.searchQuery.toLowerCase()) ||
         item.hex.toLowerCase().includes(state.searchQuery.toLowerCase())
@@ -261,8 +209,6 @@ function renderUI() {
         `;
         paletteCardsGrid.appendChild(card);
     });
-
-    updateCssVariables();
 }
 
 // Set Main Color from RGB
@@ -303,24 +249,11 @@ autoGenToggle.addEventListener('change', (e) => {
     }
 });
 
-// Hue Slider Dragging
-let isDraggingHue = false;
-hueSlider.addEventListener('mousedown', (e) => {
-    isDraggingHue = true;
-    updateHueFromEvent(e);
-});
-window.addEventListener('mousemove', (e) => {
-    if (isDraggingHue) updateHueFromEvent(e);
-    if (isDraggingColorArea) updateColorAreaFromEvent(e);
-});
-window.addEventListener('mouseup', () => {
-    isDraggingHue = false;
-    isDraggingColorArea = false;
-});
-
+// Responsive Hue & Color Area Dragging (Support Touch & Mouse)
 function updateHueFromEvent(e) {
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const rect = hueSlider.getBoundingClientRect();
-    let x = e.clientX - rect.left;
+    let x = clientX - rect.left;
     x = Math.max(0, Math.min(rect.width, x));
     const hue = Math.round((x / rect.width) * 360);
     const hsl = rgbToHsl(state.mainColor.r, state.mainColor.g, state.mainColor.b);
@@ -328,17 +261,12 @@ function updateHueFromEvent(e) {
     setMainColorRgb(rgb.r, rgb.g, rgb.b);
 }
 
-// Color Area Dragging
-let isDraggingColorArea = false;
-colorArea.addEventListener('mousedown', (e) => {
-    isDraggingColorArea = true;
-    updateColorAreaFromEvent(e);
-});
-
 function updateColorAreaFromEvent(e) {
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
     const rect = colorArea.getBoundingClientRect();
-    let x = e.clientX - rect.left;
-    let y = e.clientY - rect.top;
+    let x = clientX - rect.left;
+    let y = clientY - rect.top;
     x = Math.max(0, Math.min(rect.width, x));
     y = Math.max(0, Math.min(rect.height, y));
     
@@ -348,6 +276,37 @@ function updateColorAreaFromEvent(e) {
     const rgb = hslToRgb(hsl.h, s, l);
     setMainColorRgb(rgb.r, rgb.g, rgb.b);
 }
+
+// Mouse events
+let isDraggingHue = false;
+let isDraggingColorArea = false;
+
+hueSlider.addEventListener('mousedown', (e) => { isDraggingHue = true; updateHueFromEvent(e); });
+colorArea.addEventListener('mousedown', (e) => { isDraggingColorArea = true; updateColorAreaFromEvent(e); });
+
+window.addEventListener('mousemove', (e) => {
+    if (isDraggingHue) updateHueFromEvent(e);
+    if (isDraggingColorArea) updateColorAreaFromEvent(e);
+});
+
+window.addEventListener('mouseup', () => {
+    isDraggingHue = false;
+    isDraggingColorArea = false;
+});
+
+// Touch events for mobile responsiveness
+hueSlider.addEventListener('touchstart', (e) => { isDraggingHue = true; updateHueFromEvent(e); });
+colorArea.addEventListener('touchstart', (e) => { isDraggingColorArea = true; updateColorAreaFromEvent(e); });
+
+window.addEventListener('touchmove', (e) => {
+    if (isDraggingHue) updateHueFromEvent(e);
+    if (isDraggingColorArea) updateColorAreaFromEvent(e);
+});
+
+window.addEventListener('touchend', () => {
+    isDraggingHue = false;
+    isDraggingColorArea = false;
+});
 
 // Search Functionality
 searchInput.addEventListener('input', (e) => {
@@ -456,24 +415,6 @@ editIndividualGlobalBtn.addEventListener('click', () => {
     openEditModal(0);
 });
 
-// Preset Select Handler
-presetSelect.addEventListener('change', (e) => {
-    const presetIndex = e.target.value;
-    const preset = state.presets[presetIndex];
-    if (preset && preset.colors) {
-        state.palette = state.palette.map(item => {
-            if (preset.colors[item.key]) {
-                const hex = preset.colors[item.key];
-                const rgb = hexToRgb(hex);
-                return { ...item, hex, r: rgb.r, g: rgb.g, b: rgb.b };
-            }
-            return item;
-        });
-        renderUI();
-        showToast(`Loaded preset: ${preset.name}`);
-    }
-});
-
 // Export JSON
 exportBtn.addEventListener('click', () => {
     const exportObj = {};
@@ -492,5 +433,4 @@ exportBtn.addEventListener('click', () => {
 });
 
 // Init App
-loadPresets();
 renderUI();
