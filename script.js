@@ -435,12 +435,37 @@ exportBtn.addEventListener('click', () => {
 // Init App
 renderUI();
 
-// HIDE LOADING SCREEN ON PAGE LOAD
+// LOADING SCREEN 15 SECONDS PROGRESS & SMOOTH FADE OUT
 window.addEventListener('load', () => {
     const loadingScreen = document.getElementById('loadingScreen');
-    if (loadingScreen) {
-        setTimeout(() => {
-            loadingScreen.classList.add('fade-out');
-        }, 500); // Delay 0.5 detik agar transisi mulus
+    const progressBarFill = document.getElementById('progressBarFill');
+    const progressPercentage = document.getElementById('progressPercentage');
+    
+    if (loadingScreen && progressBarFill && progressPercentage) {
+        const totalDuration = 15000; // 15 Detik
+        const intervalTime = 50;     // Update setiap 50ms agar mulus
+        let currentProgress = 0;
+        
+        const increment = (intervalTime / totalDuration) * 100;
+
+        const progressTimer = setInterval(() => {
+            currentProgress += increment;
+            
+            if (currentProgress >= 100) {
+                currentProgress = 100;
+                clearInterval(progressTimer);
+                
+                // Sembunyikan loading screen setelah 15 detik penuh
+                setTimeout(() => {
+                    loadingScreen.classList.add('fade-out');
+                }, 300);
+            }
+            
+            // Perbarui tampilan bar dan teks persentase
+            const roundedProgress = Math.round(currentProgress);
+            progressBarFill.style.width = `${roundedProgress}%`;
+            progressPercentage.textContent = `${roundedProgress}%`;
+            
+        }, intervalTime);
     }
 });
