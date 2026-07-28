@@ -434,3 +434,13 @@ exportBtn.addEventListener('click', () => {
 
 // Init App
 renderUI();
+
+// HIDE LOADING SCREEN ON PAGE LOAD
+window.addEventListener('load', () => {
+    const loadingScreen = document.getElementById('loadingScreen');
+    if (loadingScreen) {
+        setTimeout(() => {
+            loadingScreen.classList.add('fade-out');
+        }, 500); // Delay 0.5 detik agar transisi mulus
+    }
+});
