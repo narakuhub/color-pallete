@@ -736,7 +736,9 @@ input:checked + .slider:before {
     background: var(--primary-hover);
 }
 
-/* LOADING SCREEN STYLES */
+/* ==========================================
+   LOADING SCREEN STYLING (15s Progress & FX)
+   ========================================== */
 .loading-screen {
     position: fixed;
     top: 0;
@@ -748,7 +750,7 @@ input:checked + .slider:before {
     align-items: center;
     justify-content: center;
     z-index: 99999;
-    transition: opacity 0.4s ease, visibility 0.4s ease;
+    transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .loading-screen.fade-out {
@@ -760,26 +762,96 @@ input:checked + .slider:before {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
+    width: 100%;
+    max-width: 320px;
+    padding: 0 24px;
 }
 
-.loader-content span {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-secondary);
-    letter-spacing: 0.5px;
+/* Spinner Melingkar Berputar */
+.spinner-container {
+    position: relative;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 4px;
 }
 
 .spinner {
-    width: 36px;
-    height: 36px;
+    position: absolute;
+    width: 50px;
+    height: 50px;
     border: 3px solid var(--ui-stroke);
     border-top: 3px solid var(--primary);
     border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+    animation: spin 0.9s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
 }
 
+.spinner-glow {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background: var(--primary);
+    filter: blur(14px);
+    opacity: 0.4;
+    animation: pulseGlow 1.5s ease-in-out infinite alternate;
+}
+
+/* Animasi Teks NARAKU COLOR PALETTE Bergerak/Shimmer */
+.loader-title {
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    background: linear-gradient(90deg, var(--text-primary) 0%, var(--primary) 50%, var(--text-primary) 100%);
+    background-size: 200% auto;
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: textShimmer 2.5s linear infinite;
+    text-align: center;
+}
+
+/* Bar Fill Progres */
+.progress-bar-track {
+    width: 100%;
+    height: 8px;
+    background-color: var(--card-bg);
+    border: 1px solid var(--ui-stroke);
+    border-radius: 10px;
+    overflow: hidden;
+    padding: 1px;
+}
+
+.progress-bar-fill {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, var(--secondary), var(--primary));
+    border-radius: 8px;
+    transition: width 0.1s linear;
+}
+
+.progress-percentage {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    font-family: monospace;
+    letter-spacing: 1px;
+}
+
+/* Keyframes Animasi */
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+@keyframes pulseGlow {
+    0% { transform: scale(0.8); opacity: 0.2; }
+    100% { transform: scale(1.2); opacity: 0.6; }
+}
+
+@keyframes textShimmer {
+    0% { background-position: 0% center; }
+    100% { background-position: 200% center; }
 }
