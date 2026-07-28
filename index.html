@@ -10,8 +10,15 @@
     <!-- LOADING SCREEN -->
 <div id="loadingScreen" class="loading-screen">
     <div class="loader-content">
-        <div class="spinner"></div>
-        <span>Loading NARAKU Palette...</span>
+        <div class="spinner-container">
+            <div class="spinner"></div>
+            <div class="spinner-glow"></div>
+        </div>
+        <h1 class="loader-title">NARAKU COLOR PALETTE</h1>
+        <div class="progress-bar-track">
+            <div id="progressBarFill" class="progress-bar-fill"></div>
+        </div>
+        <span id="progressPercentage" class="progress-percentage">0%</span>
     </div>
 </div>
     
